@@ -1,38 +1,51 @@
+const { getList, getDetail, newBlog, updateBlog, delBlog } = require('../controller/blog');
+const { SuccessModel, ErrorModel } = require('../model/resModel')
+
 const handleBlogRouter = (req, res) => {
   const method = req.method;
+  const id = req.query.id;
 
   // 获取列表
   if (method === 'GET' && req.path === '/api/blog/list') {
-    return {
-      msg: '这是获取列表接口'
-    }
+    const author = req.query.author || '';
+    const keyword = req.query.keyword || '';
+    const listData = getList(author, keyword);
+    return new SuccessModel(listData);
   }
 
   // 获取详情
   if (method === 'GET' && req.path === '/api/blog/detail') {
-    return {
-      msg: '这是详情接口'
-    }
+    const data = getDetail(id);
+    
+    return new SuccessModel(data);
   }
 
   // 新建
   if (method === 'POST' && req.path === '/api/blog/new') {
-    return {
-      msg: '这是新建接口'
-    }
+    const blogData = req.body;
+    const data = newBlog(blogData); 
+    return new SuccessModel(data);
   }
 
   // 更新
   if (method === 'POST' && req.path === '/api/blog/update') {
-    return {
-      msg: '这是更新接口'
+    const data = updateBlog(id);
+
+    if (data) {
+      return new SuccessModel(data);
+    } else {
+      return new ErrorModel('更新失败');
     }
   }
 
   // 删除
   if (method === 'POST' && req.path === '/api/blog/del') {
-    return {
-      msg: '这是删除接口'
+    const data = delBlog(id);
+
+    if (data) {
+      return new SuccessModel(data);
+    } else {
+      return new ErrorModel('更新失败');
     }
   }
 
