@@ -1,10 +1,12 @@
+const { exec } = require('../db/mysql');
 
 const loginCheck = (username, password) => {
-  if (username === 'lee' && password === '123') {
-    return {
-      msg: '这是登陆的接口'
-    }
-  } 
+  const sql = `
+    select username, realname from users where username='${username}' and password='${password}' 
+  `
+  return exec(sql).then(rows => {
+    return rows[0] || {}
+  })
 }
 
 module.exports = {
