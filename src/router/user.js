@@ -2,14 +2,12 @@ const { login } = require('../controller/user');
 const { SuccessModel, ErrorModel } = require('../model/resModel')
 
 
-
 const handleUserRouter = (req, res) => {
   const method = req.method;
 
   // 登陆
-  if (method === 'GET' && req.path === '/api/user/login') {
-    // const { username, password } = req.body;
-    const { username, password } = req.query;
+  if (method === 'POST' && req.path === '/api/user/login') {
+    const { username, password } = req.body;
     const result = login(username, password);
 
     return result.then(data => {

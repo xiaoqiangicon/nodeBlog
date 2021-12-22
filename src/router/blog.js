@@ -1,6 +1,13 @@
 const { getList, getDetail, newBlog, updateBlog, delBlog } = require('../controller/blog');
 const { SuccessModel, ErrorModel } = require('../model/resModel')
 
+// 统一的登陆验证函数
+const loginCheck = (req) => {
+  if (!req.session.username) {
+    return Promise.resolve(new ErrorModel('尚未登陆'));
+  }
+}
+
 const handleBlogRouter = (req, res) => {
   const method = req.method;
   const id = req.query.id;
@@ -11,6 +18,15 @@ const handleBlogRouter = (req, res) => {
     const keyword = req.query.keyword || '';
     // const listData = getList(author, keyword);
     // return new SuccessModel(listData);
+
+    if (req.query.isadmin) {
+      const loginCheckResult = loginCheck(req);
+      if (loginCheckResult) {
+        return loginCheckResult;
+      }
+      // 强制查询自己的博客
+      author = req.session.username;
+    }
     const result = getList(author, keyword);
     return result.then(listData => {
       return new SuccessModel(listData);
@@ -30,10 +46,16 @@ const handleBlogRouter = (req, res) => {
 
   // 新建
   if (method === 'POST' && req.path === '/api/blog/new') {
+    const loginCheckResult = loginCheck(req);
+    if (loginCheckResult) {
+      // 未登录
+      return loginCheckResult;
+    }
+
     // const blogData = req.body;
     // const data = newBlog(blogData); 
     // return new SuccessModel(data);
-    const author = 'lisi';
+    const author = req.session.username;
     req.body.author = author; // 假数据待开发登陆时改成真实数据
     const result = newBlog(req.body);
     return result.then(data => {
@@ -43,6 +65,11 @@ const handleBlogRouter = (req, res) => {
 
   // 更新
   if (method === 'POST' && req.path === '/api/blog/update') {
+    const loginCheckResult = loginCheck(req);
+    if (loginCheckResult) {
+      // 未登录
+      return loginCheckResult;
+    }
     // const data = updateBlog(id);
 
     // if (data) {
@@ -62,7 +89,13 @@ const handleBlogRouter = (req, res) => {
 
   // 删除
   if (method === 'POST' && req.path === '/api/blog/del') {
-    const author = 'lisi';
+    const loginCheckResult = loginCheck(req);
+    if (loginCheckResult) {
+      // 未登录
+      return loginCheckResult;
+    }
+
+    const author = req.session.username;
     const id = req.body.id;
     const result = delBlog(id, author);
 

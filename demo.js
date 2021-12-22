@@ -1,4 +1,4 @@
-const mysql = require('mysql');
+// const mysql = require('mysql');
 
 // const con = mysql.createConnection({
 //   host: 'localhost',
@@ -28,16 +28,18 @@ const mysql = require('mysql');
 // con.end();
 
 // redis
-const redis = require('redis');
+const Redis = require('ioredis');
 
-const redisClient = redis.createClient(6379, '127.0.0.1');
+const redisClient = new Redis({
+  prot: 6379, 
+});
 redisClient.on('error', err => {
   console.error(err);
 })
 
 // 测试
-redisClient.set('name', 'lee', redis.print);
-redisClient.get('name', (err, valu) => {
+redisClient.set('name', 'lee');
+redisClient.get('name', (err, val) => {
   if (err) {
     console.err(err);
     return;
